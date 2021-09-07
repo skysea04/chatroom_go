@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <title>全站聊天室列表</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container container-fluid d-flex">
+            <a class="navbar-brand" href="/">Go聊天室</a>
+            <div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/my/rooms">我的聊天室</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/create-room">建立聊天室</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container text-center my-3">
+        <h2 class="mb-3">全站聊天室列表</h2>
+
+        <!-- 聊天室列表 -->
+        <div id="room-list" class="mb-3">
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item col-4">聊天室名稱</li>
+                <li class="list-group-item col-4">室長</li>
+                <li class="list-group-item col-4">操作</li>
+            </ul>
+
+            <!-- <ul class="list-group list-group-horizontal-sm">
+                <li class="list-group-item col-4">
+                    <a href="http://www.wibibi.com" target="_blank">聊天室123</a>
+                </li>
+                <li class="list-group-item col-4">ABC</li>
+                <li class="list-group-item col-4">
+                    <a href="http://www.wibibi.com" target="_blank">進入</a>
+                </li>
+            </ul> -->
+        </div>
+        
+        <!-- 分頁 -->
+        <div id="page-bar" class="d-flex justify-content-center">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <button id="prev-page" type="button" class="btn btn-primary">上一頁</button>
+            
+                <div id="page-group" class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        分頁
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        
+                    </ul>
+                </div>
+                <button id="next-page" type="button" class="btn btn-primary">下一頁</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+    <script src="/public/js/index.js"></script>
+</body>
+</html>
