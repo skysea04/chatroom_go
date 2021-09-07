@@ -136,12 +136,11 @@ func ServeWs(m *HubManager, c echo.Context) {
 		return
 	}
 	// register a new hub and add the id into manager map
-	hub, ok := m.hubs[roomID]
-	if !ok {
-		hub = NewHub(m, roomID)
-		m.register <- hub
-		go hub.Run()
-	}
+	log.Println("1")
+	m.register <- roomID
+	log.Println("2")
+	hub := <-m.send
+	log.Println("3")
 
 	// increase the old member list in the hub and return to new member
 	var memLst []string
