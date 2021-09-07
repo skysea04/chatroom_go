@@ -83,8 +83,8 @@ func PostUser(c echo.Context) error {
 
 	var user User
 	// 檢查帳號是否重複
-	row := db_client.DBClient.QueryRow("SELECT email FROM users WHERE email = ?;", reqBody.Email)
-	if err = row.Scan(&user.Email); err == nil {
+	err = db_client.DBClient.QueryRow("SELECT email FROM users WHERE email = ?;", reqBody.Email).Scan(&user.Email)
+	if err == nil {
 		return c.JSON(400, ErrMsg{
 			Error: true,
 			Msg:   "該信箱已註冊",
@@ -92,8 +92,8 @@ func PostUser(c echo.Context) error {
 	}
 
 	// 檢查暱稱是否重複
-	row = db_client.DBClient.QueryRow("SELECT name FROM users WHERE name = ?;", reqBody.Name)
-	if err = row.Scan(&user.Name); err == nil {
+	err = db_client.DBClient.QueryRow("SELECT name FROM users WHERE name = ?;", reqBody.Name).Scan(&user.Name)
+	if err == nil {
 		return c.JSON(400, ErrMsg{
 			Error: true,
 			Msg:   "該暱稱已被使用",
@@ -126,9 +126,9 @@ func PatchUser(c echo.Context) error {
 	}
 
 	// 確認使用者存在
-	row := db_client.DBClient.QueryRow("SELECT id, name FROM users WHERE email = ? AND password = ?;", reqBody.Email, reqBody.Pwd)
 	var user User
-	if err = row.Scan(&user.ID, &user.Name); err != nil {
+	err = db_client.DBClient.QueryRow("SELECT id, name FROM users WHERE email = ? AND password = ?;", reqBody.Email, reqBody.Pwd).Scan(&user.ID, &user.Name)
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.JSON(401, ErrMsg{
 				Error: true,

@@ -44,12 +44,12 @@ func PostRoom(c echo.Context) error {
 	userID := c.Get("userID")
 	_, err = db_client.DBClient.Exec("INSERT INTO rooms(name, owner) VALUES (?, ?);", reqBody.Name, userID)
 	if err != nil {
-		// log.Print(err.Error())
 		return c.JSON(500, ErrMsg{
 			Error: true,
 			Msg:   "伺服器內部錯誤",
 		})
 	}
+
 	return c.JSON(200, echo.Map{
 		"ok":  true,
 		"msg": "建立成功!",
@@ -78,6 +78,7 @@ func GetRooms(c echo.Context) error {
 			Msg:   "伺服器內部錯誤",
 		})
 	}
+	defer rows.Close()
 	for rows.Next() {
 		if err := rows.Scan(&roomCount); err != nil {
 			return c.JSON(500, ErrMsg{
@@ -104,6 +105,7 @@ func GetRooms(c echo.Context) error {
 			Msg:   "伺服器內部錯誤",
 		})
 	}
+	rows.Close()
 	for rows.Next() {
 		var singleRoom Room
 		if err := rows.Scan(&singleRoom.ID, &singleRoom.Name, &singleRoom.Owner); err != nil {
@@ -163,6 +165,7 @@ func GetMyRooms(c echo.Context) error {
 			Msg:   "伺服器內部錯誤",
 		})
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var singleRoom Room
 		if err := rows.Scan(&singleRoom.ID, &singleRoom.Name, &singleRoom.Owner); err != nil {

@@ -13,6 +13,8 @@ func InitialiseDBConnection() {
 	if err != nil {
 		panic(err.Error())
 	}
+	db.SetConnMaxIdleTime(20)
+	db.SetMaxOpenConns(200)
 	err = db.Ping()
 	if err != nil {
 		panic(err.Error())
