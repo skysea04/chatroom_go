@@ -6,7 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var DBClient *sql.DB
+var DB *sql.DB
 
 func InitialiseDBConnection() {
 	db, err := sql.Open("mysql", "root:root@/chatroom")
@@ -20,5 +20,5 @@ func InitialiseDBConnection() {
 		panic(err.Error())
 	}
 
-	DBClient = db
+	DB = db
 }

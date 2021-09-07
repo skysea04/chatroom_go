@@ -1,5 +1,6 @@
 // api
 const userAPI = "/user"
+const userEnrtyAPI = "/user-entry"
 
 const signupForm = document.querySelector("#signup") 
 const signinForm = document.querySelector("#signin")
@@ -33,8 +34,8 @@ async function signin(e){
         email: this.querySelector("#signin-email").value,
         pwd: this.querySelector("#signin-pwd").value,
     }
-    const res = await fetch(userAPI, {
-        method: "PATCH",
+    const res = await fetch(userEnrtyAPI, {
+        method: "POST",
         body: JSON.stringify(signinData),
         headers : {'Content-Type': 'application/json'}
     })

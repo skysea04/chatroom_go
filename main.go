@@ -29,7 +29,7 @@ func main() {
 
 	e.GET("/signup", views.Signup)
 	e.POST("/user", controllers.PostUser)
-	e.PATCH("/user", controllers.PatchUser)
+	e.POST("/user-entry", controllers.LoginUser)
 
 	apis := e.Group("/api")
 	apis.Use(controllers.JwtGateKeeper)

@@ -42,7 +42,7 @@ func PostRoom(c echo.Context) error {
 	}
 
 	userID := c.Get("userID")
-	_, err = db_client.DBClient.Exec("INSERT INTO rooms(name, owner) VALUES (?, ?);", reqBody.Name, userID)
+	_, err = db_client.DB.Exec("INSERT INTO rooms(name, owner) VALUES (?, ?);", reqBody.Name, userID)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -71,7 +71,7 @@ func GetRooms(c echo.Context) error {
 	pageStatus.Page, _ = strconv.Atoi(c.QueryParam("page"))
 
 	// 獲取聊天室總數
-	rows, err := db_client.DBClient.Query("SELECT COUNT(id) FROM rooms;")
+	rows, err := db_client.DB.Query("SELECT COUNT(id) FROM rooms;")
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -98,7 +98,7 @@ func GetRooms(c echo.Context) error {
 	}
 
 	// 獲取聊天室資料
-	rows, err = db_client.DBClient.Query("SELECT rooms.id, rooms.name, users.name FROM rooms INNER JOIN users ON rooms.owner = users.id ORDER BY rooms.id DESC LIMIT ?, 10;", (pageStatus.Page-1)*10)
+	rows, err = db_client.DB.Query("SELECT rooms.id, rooms.name, users.name FROM rooms INNER JOIN users ON rooms.owner = users.id ORDER BY rooms.id DESC LIMIT ?, 10;", (pageStatus.Page-1)*10)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -139,7 +139,7 @@ func GetMyRooms(c echo.Context) error {
 	pageStatus.Page, _ = strconv.Atoi(c.QueryParam("page"))
 
 	// 獲取個人擁有的聊天室總數
-	err := db_client.DBClient.QueryRow("SELECT COUNT(owner) FROM rooms WHERE owner = ?;", userID).Scan(&roomCount)
+	err := db_client.DB.QueryRow("SELECT COUNT(owner) FROM rooms WHERE owner = ?;", userID).Scan(&roomCount)
 
 	if err != nil {
 		return c.JSON(500, ErrMsg{
@@ -158,7 +158,7 @@ func GetMyRooms(c echo.Context) error {
 	}
 
 	// 獲取個人聊天室資料
-	rows, err := db_client.DBClient.Query("SELECT rooms.id, rooms.name, users.name FROM rooms INNER JOIN users ON rooms.owner = users.id WHERE users.id = ? ORDER BY rooms.id DESC LIMIT ?, 10;", userID, (pageStatus.Page-1)*10)
+	rows, err := db_client.DB.Query("SELECT rooms.id, rooms.name, users.name FROM rooms INNER JOIN users ON rooms.owner = users.id WHERE users.id = ? ORDER BY rooms.id DESC LIMIT ?, 10;", userID, (pageStatus.Page-1)*10)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -187,7 +187,7 @@ func GetMyRooms(c echo.Context) error {
 func GetRoomInfo(c echo.Context) error {
 	var room Room
 	roomID := c.Param("id")
-	err := db_client.DBClient.QueryRow("SELECT rooms.name, users.name FROM rooms INNER JOIN users ON rooms.owner = users.id WHERE rooms.id = ?;", roomID).Scan(&room.Name, &room.Owner)
+	err := db_client.DB.QueryRow("SELECT rooms.name, users.name FROM rooms INNER JOIN users ON rooms.owner = users.id WHERE rooms.id = ?;", roomID).Scan(&room.Name, &room.Owner)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,

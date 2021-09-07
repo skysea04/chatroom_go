@@ -83,7 +83,7 @@ func PostUser(c echo.Context) error {
 
 	var user User
 	// 檢查帳號是否重複
-	err = db_client.DBClient.QueryRow("SELECT email FROM users WHERE email = ?;", reqBody.Email).Scan(&user.Email)
+	err = db_client.DB.QueryRow("SELECT email FROM users WHERE email = ?;", reqBody.Email).Scan(&user.Email)
 	if err == nil {
 		return c.JSON(400, ErrMsg{
 			Error: true,
@@ -92,7 +92,7 @@ func PostUser(c echo.Context) error {
 	}
 
 	// 檢查暱稱是否重複
-	err = db_client.DBClient.QueryRow("SELECT name FROM users WHERE name = ?;", reqBody.Name).Scan(&user.Name)
+	err = db_client.DB.QueryRow("SELECT name FROM users WHERE name = ?;", reqBody.Name).Scan(&user.Name)
 	if err == nil {
 		return c.JSON(400, ErrMsg{
 			Error: true,
@@ -100,7 +100,7 @@ func PostUser(c echo.Context) error {
 		})
 	}
 
-	_, err = db_client.DBClient.Exec("INSERT INTO users (email, password, name) VALUES (?, ?, ?);", reqBody.Email, reqBody.Pwd, reqBody.Name)
+	_, err = db_client.DB.Exec("INSERT INTO users (email, password, name) VALUES (?, ?, ?);", reqBody.Email, reqBody.Pwd, reqBody.Name)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -114,7 +114,7 @@ func PostUser(c echo.Context) error {
 }
 
 // 登入
-func PatchUser(c echo.Context) error {
+func LoginUser(c echo.Context) error {
 	var reqBody User
 	defer c.Request().Body.Close()
 	err := json.NewDecoder(c.Request().Body).Decode(&reqBody)
@@ -127,7 +127,7 @@ func PatchUser(c echo.Context) error {
 
 	// 確認使用者存在
 	var user User
-	err = db_client.DBClient.QueryRow("SELECT id, name FROM users WHERE email = ? AND password = ?;", reqBody.Email, reqBody.Pwd).Scan(&user.ID, &user.Name)
+	err = db_client.DB.QueryRow("SELECT id, name FROM users WHERE email = ? AND password = ?;", reqBody.Email, reqBody.Pwd).Scan(&user.ID, &user.Name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.JSON(401, ErrMsg{
