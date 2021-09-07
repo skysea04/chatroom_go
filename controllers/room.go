@@ -105,7 +105,7 @@ func GetRooms(c echo.Context) error {
 			Msg:   "伺服器內部錯誤",
 		})
 	}
-	rows.Close()
+	defer rows.Close()
 	for rows.Next() {
 		var singleRoom Room
 		if err := rows.Scan(&singleRoom.ID, &singleRoom.Name, &singleRoom.Owner); err != nil {

@@ -21,7 +21,8 @@ func HashPassword(pwd string) (hashedPwd string, err error) {
 func VerifyHash(pwd string, hashedPwd string) bool {
 	ok, err := argon2.VerifyEncoded([]byte(pwd), []byte(hashedPwd))
 	if err != nil {
-		log.Println(err)
+		return ok
+		// log.Println(err)
 	}
 	return ok
 }
