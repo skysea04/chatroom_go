@@ -100,7 +100,16 @@ func PostUser(c echo.Context) error {
 		})
 	}
 
-	_, err = db_client.DB.Exec("INSERT INTO users (email, password, name) VALUES (?, ?, ?);", reqBody.Email, reqBody.Pwd, reqBody.Name)
+	// hash password
+	hashedPwd, err := utils.HashPassword(reqBody.Pwd)
+	if err != nil {
+		return c.JSON(500, ErrMsg{
+			Error: true,
+			Msg:   "伺服器內部錯誤",
+		})
+	}
+
+	_, err = db_client.DB.Exec("INSERT INTO users (email, password, name) VALUES (?, ?, ?);", reqBody.Email, hashedPwd, reqBody.Name)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -127,17 +136,27 @@ func LoginUser(c echo.Context) error {
 
 	// 確認使用者存在
 	var user User
-	err = db_client.DB.QueryRow("SELECT id, name FROM users WHERE email = ? AND password = ?;", reqBody.Email, reqBody.Pwd).Scan(&user.ID, &user.Name)
+	var hashedPwd string
+	err = db_client.DB.QueryRow("SELECT id, name, password FROM users WHERE email = ?;", reqBody.Email).Scan(&user.ID, &user.Name, &hashedPwd)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.JSON(401, ErrMsg{
 				Error: true,
-				Msg:   "帳號或密碼輸入錯誤",
+				Msg:   "無此帳號",
 			})
 		}
 		return c.JSON(500, ErrMsg{
 			Error: true,
 			Msg:   err.Error(),
+		})
+	}
+
+	// ensure the input password was right
+	pwdVerify := utils.VerifyHash(reqBody.Pwd, hashedPwd)
+	if pwdVerify == false {
+		return c.JSON(401, ErrMsg{
+			Error: true,
+			Msg:   "帳號或密碼輸入錯誤",
 		})
 	}
 
