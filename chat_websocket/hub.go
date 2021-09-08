@@ -1,7 +1,5 @@
 package chat_websocket
 
-import "log"
-
 type HubManager struct {
 	hubs       map[int]*Hub
 	register   chan int
@@ -40,18 +38,6 @@ func NewHub(m *HubManager, id int) *Hub {
 func (m *HubManager) Run() {
 	for {
 		select {
-		// when new hub register
-		case hubID := <-m.register:
-			hub, ok := m.hubs[hubID]
-			if !ok {
-				hub = NewHub(m, hubID)
-				m.hubs[hubID] = hub
-				go hub.Run()
-			}
-			log.Println("11")
-			m.send <- hub
-			log.Println("22")
-
 		case hub := <-m.unregister:
 			if _, ok := m.hubs[hub.id]; ok {
 				delete(m.hubs, hub.id)

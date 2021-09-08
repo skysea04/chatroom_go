@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
+
+var mu sync.Mutex
 
 const (
 	writeWait      = 10 * time.Second
@@ -135,25 +138,21 @@ func ServeWs(m *HubManager, c echo.Context) {
 		log.Println(err)
 		return
 	}
+
 	// register a new hub and add the id into manager map
-	log.Println("1")
-	m.register <- roomID
-	log.Println("2")
-	hub := <-m.send
-	log.Println("3")
+	mu.Lock()
+	hub, ok := m.hubs[roomID]
+	if !ok {
+		hub = NewHub(m, roomID)
+		m.hubs[roomID] = hub
+		go hub.Run()
+	}
+	mu.Unlock()
 
 	// increase the old member list in the hub and return to new member
-	var memLst []string
-	for client := range hub.clients {
-		memLst = append(memLst, client.name)
-	}
-	conn.WriteJSON(map[string]interface{}{
-		"action": "showMembers",
-		"data":   memLst,
-	})
+	showOldMembers(conn, hub)
 
 	// create client, allocate connection to the hub
-	// name := c.QueryParam("name")
 	name := c.Get("userName")
 	strName := fmt.Sprintf("%v", name)
 	client := &Client{
@@ -169,8 +168,23 @@ func ServeWs(m *HubManager, c echo.Context) {
 		"action": "join",
 		"name":   strName,
 	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	client.hub.broadcast <- newMember
 
 	go client.writePump()
 	go client.readPump()
+}
+
+func showOldMembers(conn *websocket.Conn, hub *Hub) {
+	var memLst []string
+	for client := range hub.clients {
+		memLst = append(memLst, client.name)
+	}
+	conn.WriteJSON(map[string]interface{}{
+		"action": "showMembers",
+		"data":   memLst,
+	})
 }
