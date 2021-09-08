@@ -14,6 +14,30 @@ import (
 
 var mu sync.Mutex
 
+type Action int
+
+const (
+	ShowMembers Action = iota + 1
+	Join
+	SendMsg
+	Leave
+)
+
+func (a Action) String() string {
+	switch a {
+	case ShowMembers:
+		return "showMembers"
+	case Join:
+		return "join"
+	case SendMsg:
+		return "msg"
+	case Leave:
+		return "leave"
+	default:
+		return "unknown"
+	}
+}
+
 const (
 	writeWait      = 10 * time.Second
 	pongWait       = 60 * time.Second
@@ -39,7 +63,7 @@ type Client struct {
 }
 
 type Msg struct {
-	Action string `json:"action"`
+	Action Action `json:"action"`
 	Name   string `json:"name"`
 	Msg    string `json:"msg"`
 	RoomID int    `json:"roomID"`
@@ -49,7 +73,7 @@ func (c *Client) readPump() {
 	defer func() {
 		// leave the message to everyone still in the hub that one client has left
 		memberLeave, err := json.Marshal(map[string]interface{}{
-			"action": "leave",
+			"action": Leave,
 			"name":   c.name,
 		})
 		if err != nil {
@@ -165,7 +189,7 @@ func ServeWs(m *HubManager, c echo.Context) {
 
 	// add new member name to everyone in the hub
 	newMember, err := json.Marshal(map[string]interface{}{
-		"action": "join",
+		"action": Join,
 		"name":   strName,
 	})
 	if err != nil {
@@ -184,7 +208,7 @@ func showOldMembers(conn *websocket.Conn, hub *Hub) {
 		memLst = append(memLst, client.name)
 	}
 	conn.WriteJSON(map[string]interface{}{
-		"action": "showMembers",
+		"action": ShowMembers,
 		"data":   memLst,
 	})
 }

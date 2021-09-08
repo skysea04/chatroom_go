@@ -18,7 +18,7 @@ func TestValidEmail(t *testing.T) {
 
 func TestValidPwd(t *testing.T) {
 	a := utils.ValidPwd("123asdfwqweqw")
-	b := utils.ValidPwd("45sds")
+	b := utils.ValidPwd("sdad")
 	if a == true && b == false {
 		t.Log("success")
 	} else {

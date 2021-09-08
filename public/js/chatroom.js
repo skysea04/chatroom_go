@@ -7,16 +7,22 @@ const memLst = document.querySelector("#member-list")
 const msgContainer = document.querySelector("#msg-container")
 const msgForm = document.querySelector("#msg-form")
 
-
 const roomID = parseInt(location.pathname.split("/")[2])
 const wsURL = "ws://" + document.location.host + "/ws/" + roomID
 const socket = new WebSocket(wsURL)
+
+const wsAction = {
+    showMembers: 1,
+    join: 2,
+    sendMsg: 3,
+    leave: 4
+}
 
 socket.onmessage = (msg) => {
     const data = JSON.parse(msg.data)
     console.log(data)
     switch (data.action){
-        case "showMembers":
+        case wsAction.showMembers:
             if(Array.isArray(data.data)){
                 data.data.forEach(mem => {
                     addMember(mem)
@@ -24,18 +30,17 @@ socket.onmessage = (msg) => {
             }
             break
 
-        case "join":
+        case wsAction.join:
             addMember(data.name)
             break
 
-        case "msg":
+        case wsAction.sendMsg:
             const msg = data.name + "：" + data.msg
             receiveMsg(msg)
             break
 
-        case "leave":
+        case wsAction.leave:
             const myname = document.querySelector(`#user-${data.name}`)
-            console.log(myname)
             memLst.removeChild(myname)
     }
 }
@@ -52,7 +57,7 @@ function sendMsg(e){
     const msgField = this.querySelector("textarea")
     if(msgField.value === "") return
     const msgData = {
-        action: "msg",
+        action: wsAction.sendMsg,
         msg: msgField.value
     }
     msgField.value = ""
