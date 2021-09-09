@@ -15,12 +15,21 @@ const wsAction = {
     showMembers: 1,
     join: 2,
     sendMsg: 3,
-    leave: 4
+    leave: 4,
+    
+}
+socket.onclose = msg => {
+    console.log("close")
+    console.log(msg)
+}
+socket.onerror = msg => {
+    console.log("error")
+    console.log(msg)
 }
 
 socket.onmessage = (msg) => {
     const data = JSON.parse(msg.data)
-    console.log(data)
+    // console.log(data)
     switch (data.action){
         case wsAction.showMembers:
             if(Array.isArray(data.data)){
@@ -61,7 +70,7 @@ function sendMsg(e){
         msg: msgField.value
     }
     msgField.value = ""
-    console.log(msgData)
+    // console.log(msgData)
     socket.send(JSON.stringify(msgData))
 }
 

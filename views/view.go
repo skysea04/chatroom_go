@@ -1,6 +1,9 @@
 package views
 
 import (
+	"main/db_client"
+	"strconv"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,5 +24,14 @@ func CreateRoom(c echo.Context) error {
 }
 
 func ChatRoom(c echo.Context) error {
+	var roomID int
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.Redirect(302, "/")
+	}
+	err = db_client.DB.QueryRow("SELECT id FROM rooms WHERE id = ?;", id).Scan(&roomID)
+	if err != nil {
+		c.Redirect(302, "/")
+	}
 	return c.Render(200, "chatroom.html", nil)
 }

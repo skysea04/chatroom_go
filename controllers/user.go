@@ -102,12 +102,6 @@ func PostUser(c echo.Context) error {
 
 	// hash password
 	hashedPwd := utils.HashPassword(reqBody.Email, reqBody.Pwd)
-	if err != nil {
-		return c.JSON(500, ErrMsg{
-			Error: true,
-			Msg:   "伺服器內部錯誤",
-		})
-	}
 
 	_, err = db_client.DB.Exec("INSERT INTO users (email, password, name) VALUES (?, ?, ?);", reqBody.Email, hashedPwd, reqBody.Name)
 	if err != nil {

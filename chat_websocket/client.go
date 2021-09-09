@@ -96,7 +96,6 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-		// msg = bytes.TrimSpace(bytes.Replace(msg, newline, space, -1))
 
 		// parse msg to struct and add some information in to it
 		var parseMsg Msg
@@ -153,27 +152,16 @@ func (c *Client) writePump() {
 func ServeWs(c echo.Context) error {
 	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		log.Println(err)
-		conn.Close()
-		// return c.JSON(1001, echo.Map{
-		// 	"error": true,
-		// 	"msg":   "websocket升級失敗",
-		// })
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(1011, "websocket 升級失敗"))
 		return err
 	}
 
 	// confirm which hub (hub id) will be connect, if hub_id not in the hubManager create hub
 	roomID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		log.Println(err)
-		conn.Close()
-		// return c.JSON(1001, echo.Map{
-		// 	"error": true,
-		// 	"msg":   "字串轉數字失敗",
-		// })
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(1011, "字串轉數字失敗"))
 		return err
 	}
-	log.Println("asfasf")
 
 	// register a new hub and add the id into manager map
 	mu.Lock()
@@ -206,16 +194,13 @@ func ServeWs(c echo.Context) error {
 	})
 	if err != nil {
 		log.Println(err)
-		return c.JSON(1011, echo.Map{
-			"error": true,
-			"msg":   "轉換JSON失敗",
-		})
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(1011, "轉換JSON失敗"))
+		return err
 	}
 	client.hub.broadcast <- newMember
 
 	go client.writePump()
 	go client.readPump()
-
 	return nil
 }
 
