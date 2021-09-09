@@ -4,7 +4,12 @@ type HubManager struct {
 	hubs       map[int]*Hub
 	register   chan int
 	unregister chan *Hub
-	send       chan *Hub
+}
+
+var HM HubManager = HubManager{
+	hubs:       make(map[int]*Hub),
+	register:   make(chan int),
+	unregister: make(chan *Hub),
 }
 
 type Hub struct {

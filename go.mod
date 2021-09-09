@@ -8,7 +8,6 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/labstack/gommon v0.3.0 // indirect
-	github.com/matthewhartstonge/argon2 v0.1.5
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

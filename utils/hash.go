@@ -1,28 +1,16 @@
 package utils
 
 import (
-	"log"
-
-	"github.com/matthewhartstonge/argon2"
+	"crypto/sha512"
+	"fmt"
 )
 
-var argon = argon2.DefaultConfig()
-
-func HashPassword(pwd string) (hashedPwd string, err error) {
-	encodedPwd, err := argon.HashEncoded([]byte(pwd))
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	hashedPwd = string(encodedPwd)
-	return
+func HashPassword(email string, pwd string) string {
+	hashedPwd := fmt.Sprintf("%x", sha512.Sum512([]byte(email+pwd)))
+	return hashedPwd
 }
 
-func VerifyHash(pwd string, hashedPwd string) bool {
-	ok, err := argon2.VerifyEncoded([]byte(pwd), []byte(hashedPwd))
-	if err != nil {
-		return ok
-		// log.Println(err)
-	}
-	return ok
+func VerifyHash(email string, pwd string, hashedPwd string) bool {
+	pwdNeedVerify := fmt.Sprintf("%x", sha512.Sum512([]byte(email+pwd)))
+	return pwdNeedVerify == hashedPwd
 }

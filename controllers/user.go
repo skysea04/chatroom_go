@@ -101,7 +101,7 @@ func PostUser(c echo.Context) error {
 	}
 
 	// hash password
-	hashedPwd, err := utils.HashPassword(reqBody.Pwd)
+	hashedPwd := utils.HashPassword(reqBody.Email, reqBody.Pwd)
 	if err != nil {
 		return c.JSON(500, ErrMsg{
 			Error: true,
@@ -152,7 +152,7 @@ func LoginUser(c echo.Context) error {
 	}
 
 	// ensure the input password was right
-	pwdVerify := utils.VerifyHash(reqBody.Pwd, hashedPwd)
+	pwdVerify := utils.VerifyHash(reqBody.Email, reqBody.Pwd, hashedPwd)
 	if pwdVerify == false {
 		return c.JSON(401, ErrMsg{
 			Error: true,

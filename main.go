@@ -11,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var manager = chat_websocket.CreateHubManager()
+
 type Template struct {
 	templates *template.Template
 }
@@ -47,12 +49,9 @@ func main() {
 	v.GET("/chatroom/:id", views.ChatRoom)
 
 	// websocket
-	manager := chat_websocket.CreateHubManager()
-	go manager.Run()
-	v.GET("/ws/:id", func(c echo.Context) error {
-		chat_websocket.ServeWs(manager, c)
-		return nil
-	})
+	// manager := chat_websocket.CreateHubManager()
+	go chat_websocket.HM.Run()
+	v.GET("/ws/:id", chat_websocket.ServeWs)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

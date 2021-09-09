@@ -150,25 +150,37 @@ func (c *Client) writePump() {
 	}
 }
 
-func ServeWs(m *HubManager, c echo.Context) {
+func ServeWs(c echo.Context) error {
 	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		log.Println(err)
-		return
+		conn.Close()
+		// return c.JSON(1001, echo.Map{
+		// 	"error": true,
+		// 	"msg":   "websocket升級失敗",
+		// })
+		return err
 	}
+
 	// confirm which hub (hub id) will be connect, if hub_id not in the hubManager create hub
 	roomID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println(err)
-		return
+		conn.Close()
+		// return c.JSON(1001, echo.Map{
+		// 	"error": true,
+		// 	"msg":   "字串轉數字失敗",
+		// })
+		return err
 	}
+	log.Println("asfasf")
 
 	// register a new hub and add the id into manager map
 	mu.Lock()
-	hub, ok := m.hubs[roomID]
+	hub, ok := HM.hubs[roomID]
 	if !ok {
-		hub = NewHub(m, roomID)
-		m.hubs[roomID] = hub
+		hub = NewHub(&HM, roomID)
+		HM.hubs[roomID] = hub
 		go hub.Run()
 	}
 	mu.Unlock()
@@ -194,12 +206,17 @@ func ServeWs(m *HubManager, c echo.Context) {
 	})
 	if err != nil {
 		log.Println(err)
-		return
+		return c.JSON(1011, echo.Map{
+			"error": true,
+			"msg":   "轉換JSON失敗",
+		})
 	}
 	client.hub.broadcast <- newMember
 
 	go client.writePump()
 	go client.readPump()
+
+	return nil
 }
 
 func showOldMembers(conn *websocket.Conn, hub *Hub) {
