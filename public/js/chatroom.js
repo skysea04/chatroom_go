@@ -32,8 +32,8 @@ socket.onmessage = (msg) => {
     // console.log(data)
     switch (data.action){
         case wsAction.showMembers:
-            if(Array.isArray(data.data)){
-                data.data.forEach(mem => {
+            if(Array.isArray(data.memLst)){
+                data.memLst.forEach(mem => {
                     addMember(mem)
                 })
             }
@@ -70,7 +70,6 @@ function sendMsg(e){
         msg: msgField.value
     }
     msgField.value = ""
-    // console.log(msgData)
     socket.send(JSON.stringify(msgData))
 }
 

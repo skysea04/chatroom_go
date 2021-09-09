@@ -63,18 +63,18 @@ type Client struct {
 }
 
 type Msg struct {
-	Action Action `json:"action"`
-	Name   string `json:"name"`
-	Msg    string `json:"msg"`
-	RoomID int    `json:"roomID"`
+	Action Action   `json:"action"`
+	MemLst []string `json:"memLst"`
+	Name   string   `json:"name"`
+	Msg    string   `json:"msg"`
 }
 
 func (c *Client) readPump() {
 	defer func() {
 		// leave the message to everyone still in the hub that one client has left
-		memberLeave, err := json.Marshal(map[string]interface{}{
-			"action": Leave,
-			"name":   c.name,
+		memberLeave, err := json.Marshal(Msg{
+			Action: Leave,
+			Name:   c.name,
 		})
 		if err != nil {
 			log.Println(err)
@@ -100,7 +100,6 @@ func (c *Client) readPump() {
 		// parse msg to struct and add some information in to it
 		var parseMsg Msg
 		json.Unmarshal(msg, &parseMsg)
-		parseMsg.RoomID = c.hub.id
 		parseMsg.Name = c.name
 		msg, err = json.Marshal(parseMsg)
 		// log.Printf("%#v", parseMsg)
@@ -188,9 +187,9 @@ func ServeWs(c echo.Context) error {
 	client.hub.register <- client
 
 	// add new member name to everyone in the hub
-	newMember, err := json.Marshal(map[string]interface{}{
-		"action": Join,
-		"name":   strName,
+	newMember, err := json.Marshal(Msg{
+		Action: Join,
+		Name:   strName,
 	})
 	if err != nil {
 		log.Println(err)
@@ -209,8 +208,8 @@ func showOldMembers(conn *websocket.Conn, hub *Hub) {
 	for client := range hub.clients {
 		memLst = append(memLst, client.name)
 	}
-	conn.WriteJSON(map[string]interface{}{
-		"action": ShowMembers,
-		"data":   memLst,
+	conn.WriteJSON(Msg{
+		Action: ShowMembers,
+		MemLst: memLst,
 	})
 }
