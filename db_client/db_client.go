@@ -9,16 +9,12 @@ import (
 var DB *sql.DB
 
 func InitialiseDBConnection() {
-	db, err := sql.Open("mysql", "root:root@/chatroom")
+	db, err := sql.Open("mysql", "root:root@tcp(db:3306)/chatroom?charset=utf8")
 	if err != nil {
 		panic(err.Error())
 	}
 	db.SetConnMaxIdleTime(20)
 	db.SetMaxOpenConns(200)
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
 
 	DB = db
 }

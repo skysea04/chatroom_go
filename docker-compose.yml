@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.sql
+    platform: linux/amd64
+    networks:
+      - chat
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+    env_file:
+      - db_var.env
+
+  app:
+    depends_on:
+      - "db"
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    networks:
+      - chat
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_data:
+
+networks:
+  chat:
